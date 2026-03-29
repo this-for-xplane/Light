@@ -7,7 +7,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        * { transition: all 0.2s ease-out; -webkit-tap-highlight-color: transparent; outline: none; }
+        * { transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275); -webkit-tap-highlight-color: transparent; outline: none; }
         body { margin: 0; padding: 0; overflow: hidden; background-color: #000; font-family: -apple-system, sans-serif; }
         
         .viewport {
@@ -19,35 +19,36 @@
         }
 
         .switch-plate {
-            width: 160px;
-            height: 260px;
-            background: #e5e5e5;
-            border-radius: 20px;
-            padding: 10px;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            width: 170px;
+            height: 280px;
+            background: #e0e0e0;
+            border-radius: 24px;
+            padding: 12px;
+            box-shadow: 0 25px 60px rgba(0,0,0,0.6);
             display: flex;
             align-items: center;
             justify-content: center;
+            border: 1px solid rgba(255,255,255,0.2);
         }
 
         .switch-well {
             width: 100%;
             height: 100%;
-            background: #d1d1d1;
-            border-radius: 12px;
+            background: #cdcdcd;
+            border-radius: 16px;
             position: relative;
             overflow: hidden;
-            border: 1px solid rgba(0,0,0,0.1);
+            box-shadow: inset 0 2px 10px rgba(0,0,0,0.1);
         }
 
         .switch-handle {
             width: 100%;
             height: 70%;
-            background: linear-gradient(to bottom, #ffffff, #f0f0f0);
+            background: linear-gradient(to bottom, #ffffff, #f8f8f8);
             position: absolute;
             left: 0;
             cursor: pointer;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.15);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -55,27 +56,51 @@
 
         .switch-off .switch-handle {
             top: 0;
-            border-bottom: 8px solid #bcbcbc;
-            border-radius: 10px 10px 0 0;
+            border-bottom: 10px solid #b1b1b1;
+            border-radius: 14px 14px 0 0;
         }
 
         .switch-on .switch-handle {
             top: 30%;
-            border-top: 8px solid #bcbcbc;
-            border-radius: 0 0 10px 10px;
+            border-top: 10px solid #b1b1b1;
+            border-radius: 0 0 14px 14px;
         }
+
+        @keyframes slideUp {
+            0% { transform: translateY(100%); opacity: 0; }
+            10% { transform: translateY(0); opacity: 1; }
+            90% { transform: translateY(0); opacity: 1; }
+            100% { transform: translateY(-100%); opacity: 0; }
+        }
+        .toast-notify { animation: slideUp 3.5s forwards; }
+
+        @keyframes donatePulse {
+            0% { transform: scale(1); box-shadow: 0 4px 0px #ca8a04; }
+            50% { transform: scale(1.05); box-shadow: 0 8px 15px rgba(254, 240, 138, 0.5); }
+            100% { transform: scale(1); box-shadow: 0 4px 0px #ca8a04; }
+        }
+        .donate-btn { animation: donatePulse 2s infinite ease-in-out; }
+
+        .supporter-badge { color: #facc15; font-weight: 900; margin-left: 4px; }
     </style>
 </head>
 <body id="main-body">
 
+    <div id="toast-container" class="fixed top-24 left-0 right-0 z-[300] flex flex-col items-center pointer-events-none px-6"></div>
+
     <div class="viewport">
-        <div class="absolute top-12 left-0 right-0 flex justify-between px-8">
-            <div onclick="window.open('https://toss.me/temp')" class="px-6 py-3 bg-blue-600 text-white font-black text-xs rounded-lg shadow-lg active:scale-95">DONATE</div>
-            <div id="settings-btn" class="px-6 py-3 bg-white text-black font-black text-xs rounded-lg shadow-lg active:scale-95 border border-zinc-200">SETTINGS</div>
+        <div class="absolute top-12 left-0 right-0 flex justify-between px-6 items-center">
+            <button id="settings-btn" class="p-3 bg-zinc-800/50 backdrop-blur-md rounded-2xl border border-zinc-700 active:scale-90">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.38a2 2 0 0 0-.73-2.73l-.15-.1a2 2 0 0 1-1-1.72v-.51a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
+            </button>
+            
+            <button id="donate-btn-action" class="donate-btn px-5 py-2.5 bg-yellow-400 text-black font-black text-[10px] rounded-2xl shadow-[0_4px_0px_#ca8a04] active:shadow-none active:translate-y-1 flex items-center gap-2 uppercase tracking-tighter">
+                <span>💛</span> DONATE (KAKAOPAY)
+            </button>
         </div>
 
-        <div class="mb-12">
-            <h1 id="actor-text" class="text-zinc-500 font-black text-2xl italic uppercase tracking-tighter text-center leading-tight">Ready</h1>
+        <div class="mb-10 text-center">
+            <h1 id="actor-text" class="text-zinc-600 font-black text-3xl italic uppercase tracking-tighter leading-none whitespace-pre">Ready</h1>
         </div>
 
         <div id="switch-container" class="switch-plate switch-off">
@@ -84,45 +109,48 @@
             </div>
         </div>
 
-        <div class="mt-12 flex flex-col items-center gap-6">
-            <div id="id-editor" class="flex items-center gap-2 cursor-pointer">
-                <span id="current-id" class="text-xs font-black tracking-widest text-zinc-400 uppercase">ID: LOADING</span>
-                <input id="id-input" type="text" maxlength="8" class="hidden bg-transparent border-b border-orange-500 text-sm font-black text-center outline-none text-orange-500 uppercase">
+        <div class="mt-12 flex flex-col items-center gap-6 w-full">
+            <div id="id-editor" class="flex flex-col items-center gap-1 cursor-pointer">
+                <div class="flex items-center">
+                    <span id="current-id" class="text-[10px] font-black tracking-[0.3em] text-zinc-500 uppercase opacity-50">ID: LOADING</span>
+                    <span id="my-supporter-badge" class="supporter-badge hidden">👑 SUPPORTER</span>
+                </div>
+                <input id="id-input" type="text" maxlength="8" class="hidden bg-transparent border-b-2 border-yellow-500 text-lg font-black text-center outline-none text-yellow-500 uppercase">
             </div>
 
-            <div id="live-indicator" class="flex items-center gap-2.5 bg-zinc-800/50 px-5 py-2 rounded-full border border-zinc-700">
-                <span id="dot" class="w-2.5 h-2.5 rounded-full bg-red-500"></span>
-                <span id="live-count" class="text-[11px] font-black text-white uppercase tracking-widest italic">Connecting...</span>
+            <div id="live-indicator" class="flex items-center gap-3 bg-zinc-900/80 backdrop-blur-md px-6 py-3 rounded-full border border-zinc-800 shadow-2xl">
+                <span id="dot" class="w-2.5 h-2.5 rounded-full bg-red-500 animate-pulse"></span>
+                <span id="live-count" class="text-[11px] font-black text-white uppercase tracking-widest italic">Wait...</span>
             </div>
         </div>
     </div>
 
-    <!-- 설정 레이어 -->
-    <div id="settings-menu" class="hidden fixed inset-0 z-[200] flex items-center justify-center bg-black/80 backdrop-blur-md px-8">
-        <div class="bg-white p-8 rounded-3xl w-full max-w-sm border-4 border-black">
-            <h2 class="text-2xl font-black mb-8 uppercase italic border-b-4 border-black pb-2">Settings</h2>
+    <!-- 설정 모달 -->
+    <div id="settings-menu" class="hidden fixed inset-0 z-[200] flex items-center justify-center bg-black/90 backdrop-blur-xl px-8">
+        <div class="bg-zinc-100 p-8 rounded-[2.5rem] w-full max-w-sm border-2 border-white shadow-2xl text-black">
+            <h2 class="text-3xl font-black mb-8 uppercase italic border-b-4 border-black pb-2">Settings</h2>
             <div class="space-y-8">
                 <div class="flex justify-between items-center">
-                    <span class="font-black text-sm italic uppercase">Sound FX</span>
-                    <button id="toggle-sfx" class="w-12 h-6 bg-black rounded-full relative p-1">
-                        <div id="sfx-knob" class="w-4 h-4 bg-white rounded-full transition-all"></div>
+                    <span class="font-black text-lg italic uppercase">Sound FX</span>
+                    <button id="toggle-sfx" class="w-14 h-7 bg-zinc-300 rounded-full relative p-1 shadow-inner">
+                        <div id="sfx-knob" class="w-5 h-5 bg-white rounded-full shadow-md transition-all"></div>
                     </button>
                 </div>
                 <div class="flex justify-between items-center">
-                    <span class="font-black text-sm italic uppercase">Haptic (Vibrate)</span>
-                    <button id="toggle-haptic" class="w-12 h-6 bg-black rounded-full relative p-1">
-                        <div id="haptic-knob" class="w-4 h-4 bg-white rounded-full transition-all"></div>
+                    <span class="font-black text-lg italic uppercase">Haptic</span>
+                    <button id="toggle-haptic" class="w-14 h-7 bg-zinc-300 rounded-full relative p-1 shadow-inner">
+                        <div id="haptic-knob" class="w-5 h-5 bg-white rounded-full shadow-md transition-all"></div>
                     </button>
                 </div>
             </div>
-            <button id="close-settings" class="mt-12 w-full py-4 bg-black text-white text-sm font-black uppercase active:bg-zinc-800">Close</button>
+            <button id="close-settings" class="mt-12 w-full py-5 bg-black text-white text-lg font-black uppercase rounded-2xl active:scale-95">Save & Close</button>
         </div>
     </div>
 
     <script>
-        // Vercel 환경 변수로 치환될 변수 (Build Command 설정 필요)
         const SUPABASE_URL = "VITE_SUPABASE_URL_PLACEHOLDER"; 
         const SUPABASE_KEY = "VITE_SUPABASE_KEY_PLACEHOLDER"; 
+        const KAKAO_PAY_URL = "https://qr.kakaopay.com/FJA61P0Gs";
         
         let supabaseClient = null;
         if(SUPABASE_URL.startsWith("http")) {
@@ -130,7 +158,8 @@
         }
 
         let isOn = false;
-        let myId = localStorage.getItem('switch-user-id') || `U-${Math.floor(Math.random()*900)+100}`;
+        let isSupporter = localStorage.getItem('is-supporter') === 'true';
+        let myId = localStorage.getItem('switch-user-id') || `USER-${Math.floor(Math.random()*8999)+1000}`;
         let config = { 
             sfx: localStorage.getItem('cfg-sfx') !== 'false', 
             haptic: localStorage.getItem('cfg-haptic') !== 'false' 
@@ -141,95 +170,124 @@
         const actorText = document.getElementById('actor-text');
         const actualBtn = document.getElementById('actual-btn');
         const idDisplay = document.getElementById('current-id');
+        const supporterBadge = document.getElementById('my-supporter-badge');
         const liveIndicator = document.getElementById('live-indicator');
         const liveCountText = document.getElementById('live-count');
         const dot = document.getElementById('dot');
+        const toastContainer = document.getElementById('toast-container');
 
-        idDisplay.innerText = `ID: ${myId}`;
+        function updateMyInfo() {
+            idDisplay.innerText = `ID: ${myId}`;
+            if(isSupporter) supporterBadge.classList.remove('hidden');
+        }
 
-        function updateUI(senderId = myId) {
+        function updateUI(senderId = myId, senderIsSupporter = isSupporter) {
+            const displayName = senderIsSupporter ? `${senderId} 👑` : senderId;
             if (isOn) {
                 body.style.backgroundColor = "#FFFFFF";
                 container.classList.replace('switch-off', 'switch-on');
-                actorText.innerText = `${senderId}\nTURNED ON`;
+                actorText.innerText = `${displayName}\nSWITCH ON`;
                 actorText.style.color = "#000";
-                liveIndicator.className = "flex items-center gap-2.5 bg-zinc-100 px-5 py-2 rounded-full border border-zinc-300";
+                liveIndicator.className = "flex items-center gap-3 bg-white px-6 py-3 rounded-full border border-zinc-200 shadow-xl";
                 liveCountText.style.color = "#000";
             } else {
                 body.style.backgroundColor = "#000";
                 container.classList.replace('switch-on', 'switch-off');
-                actorText.innerText = `${senderId}\nTURNED OFF`;
-                actorText.style.color = "#444";
-                liveIndicator.className = "flex items-center gap-2.5 bg-black/80 px-5 py-2 rounded-full border border-zinc-700";
+                actorText.innerText = `${displayName}\nSWITCH OFF`;
+                actorText.style.color = "#555";
+                liveIndicator.className = "flex items-center gap-3 bg-zinc-900/80 px-6 py-3 rounded-full border border-zinc-800 shadow-2xl";
                 liveCountText.style.color = "#fff";
             }
-            document.getElementById('sfx-knob').style.marginLeft = config.sfx ? '24px' : '0';
-            document.getElementById('haptic-knob').style.marginLeft = config.haptic ? '24px' : '0';
+            document.getElementById('sfx-knob').style.marginLeft = config.sfx ? '28px' : '0';
+            document.getElementById('sfx-knob').parentElement.style.backgroundColor = config.sfx ? '#22c55e' : '#d4d4d8';
+            document.getElementById('haptic-knob').style.marginLeft = config.haptic ? '28px' : '0';
+            document.getElementById('haptic-knob').parentElement.style.backgroundColor = config.haptic ? '#22c55e' : '#d4d4d8';
+        }
+
+        function showDonationToast(donorId) {
+            const toast = document.createElement('div');
+            toast.className = "toast-notify mb-4 px-6 py-4 bg-yellow-400 text-black font-black rounded-3xl shadow-2xl flex flex-col items-center border-4 border-black";
+            toast.innerHTML = `<span class="text-xs opacity-70 uppercase tracking-tighter">New Supporter Alert</span>
+                               <span class="text-sm">👑 ${donorId}님이 후원을 고려 중입니다!</span>`;
+            toastContainer.appendChild(toast);
+            setTimeout(() => toast.remove(), 4000);
+            
+            if (config.sfx) {
+                const audio = new Audio("https://assets.mixkit.co/active_storage/sfx/2019/2019-preview.mp3");
+                audio.volume = 0.15;
+                audio.play().catch(()=>{});
+            }
         }
 
         if (supabaseClient) {
-            const channel = supabaseClient.channel('global-presence', {
-                config: { presence: { key: myId } }
-            });
+            const channel = supabaseClient.channel('global-main', { config: { presence: { key: myId } } });
 
-            // Presence 데이터 동기화 (실시간 접속자 수 파악)
             channel
             .on('presence', { event: 'sync' }, () => {
                 const state = channel.presenceState();
                 const count = Object.keys(state).length;
-                liveCountText.innerText = `${count.toLocaleString()} LIVE CONNECTED`;
+                liveCountText.innerText = `${count.toLocaleString()} CONNECTED`;
             })
-            // 브로드캐스트 (스위치 상태 동기화)
             .on('broadcast', { event: 'toggle' }, ({ payload }) => {
                 isOn = payload.status;
-                updateUI(payload.id);
+                updateUI(payload.id, payload.isSupporter);
                 playFeedback(false); 
+            })
+            .on('broadcast', { event: 'donation_intent' }, ({ payload }) => {
+                showDonationToast(payload.id);
             })
             .subscribe(async (status) => {
                 if (status === 'SUBSCRIBED') {
-                    dot.className = "w-2.5 h-2.5 rounded-full bg-green-500 shadow-[0_0_8px_#22c55e]";
-                    // 내 접속 상태 등록
-                    await channel.track({ online_at: new Date().toISOString() });
+                    dot.className = "w-2.5 h-2.5 rounded-full bg-green-500 shadow-[0_0_12px_#22c55e]";
+                    await channel.track({ online_at: new Date().toISOString(), isSupporter: isSupporter });
                 }
             });
 
             window.broadcastToggle = (status) => {
-                channel.send({
-                    type: 'broadcast',
-                    event: 'toggle',
-                    payload: { id: myId, status: status }
-                });
+                channel.send({ type: 'broadcast', event: 'toggle', payload: { id: myId, status: status, isSupporter: isSupporter } });
+            };
+
+            window.broadcastDonation = () => {
+                channel.send({ type: 'broadcast', event: 'donation_intent', payload: { id: myId } });
             };
         }
 
-        function playFeedback(vibrateOnly = false) {
-            if (config.sfx && !vibrateOnly) {
-                const sfx = new Audio(isOn 
-                    ? "https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3" 
-                    : "https://assets.mixkit.co/active_storage/sfx/2572/2572-preview.mp3");
-                sfx.volume = 0.2;
+        function playFeedback(isInternal = true) {
+            if (config.sfx) {
+                const sfxUrl = isOn ? "https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3" : "https://assets.mixkit.co/active_storage/sfx/2572/2572-preview.mp3";
+                const sfx = new Audio(sfxUrl);
+                sfx.volume = 0.1;
                 sfx.play().catch(()=>{});
             }
-            if (config.haptic && navigator.vibrate) {
-                navigator.vibrate(30);
-            }
+            if (config.haptic && navigator.vibrate) navigator.vibrate(isOn ? 30 : 15);
         }
 
         function trigger() {
             isOn = !isOn;
-            updateUI(myId);
-            playFeedback(false);
+            updateUI(myId, isSupporter);
+            playFeedback(true);
             if (window.broadcastToggle) window.broadcastToggle(isOn);
         }
 
         actualBtn.addEventListener('click', trigger);
+
+        document.getElementById('donate-btn-action').addEventListener('click', () => {
+            if (window.broadcastDonation) window.broadcastDonation();
+            // 후원 버튼을 누르면 이 유저를 일시적으로 Supporter로 간주 (테스트용/유도용)
+            // 실제로는 송금 확인이 안 되지만, 유저에게 기분을 내게 해줌
+            isSupporter = true;
+            localStorage.setItem('is-supporter', 'true');
+            updateMyInfo();
+            
+            setTimeout(() => { window.open(KAKAO_PAY_URL, '_blank'); }, 500);
+        });
 
         document.getElementById('settings-btn').addEventListener('click', () => document.getElementById('settings-menu').classList.remove('hidden'));
         document.getElementById('toggle-sfx').addEventListener('click', () => { config.sfx = !config.sfx; updateUI(); });
         document.getElementById('toggle-haptic').addEventListener('click', () => { 
             config.haptic = !config.haptic; 
             updateUI(); 
-            if(config.haptic && navigator.vibrate) navigator.vibrate(40);
+            if(config.haptic && navigator.vibrate) navigator.vibrate(50);
         });
         document.getElementById('close-settings').addEventListener('click', () => {
             localStorage.setItem('cfg-sfx', config.sfx);
@@ -239,6 +297,7 @@
 
         document.getElementById('id-editor').addEventListener('click', () => {
             idDisplay.classList.add('hidden');
+            supporterBadge.classList.add('hidden');
             const input = document.getElementById('id-input');
             input.classList.remove('hidden');
             input.value = myId;
@@ -249,12 +308,13 @@
             if (e.target.value.trim()) {
                 myId = e.target.value.trim().toUpperCase().substring(0,8);
                 localStorage.setItem('switch-user-id', myId);
-                idDisplay.innerText = `ID: ${myId}`;
             }
+            updateMyInfo();
             idDisplay.classList.remove('hidden');
             e.target.classList.add('hidden');
         });
 
+        updateMyInfo();
         updateUI();
     </script>
 </body>
