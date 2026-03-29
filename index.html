@@ -53,46 +53,29 @@
             justify-content: center;
         }
 
-        /* OFF 상태: 손잡이가 위로 (그림자 아래로) */
         .switch-off .switch-handle {
             top: 0;
             border-bottom: 8px solid #bcbcbc;
             border-radius: 10px 10px 0 0;
         }
 
-        /* ON 상태: 손잡이가 아래로 (그림자 위로) */
         .switch-on .switch-handle {
             top: 30%;
             border-top: 8px solid #bcbcbc;
             border-radius: 0 0 10px 10px;
-        }
-
-        .circle-btn {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 10px;
-            font-weight: 900;
-            cursor: pointer;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-            text-transform: uppercase;
         }
     </style>
 </head>
 <body id="main-body">
 
     <div class="viewport">
-        <!-- 상단 버튼들 -->
         <div class="absolute top-12 left-0 right-0 flex justify-between px-8">
             <div onclick="window.open('https://toss.me/temp')" class="px-6 py-3 bg-blue-600 text-white font-black text-xs rounded-lg shadow-lg active:scale-95">DONATE</div>
             <div id="settings-btn" class="px-6 py-3 bg-white text-black font-black text-xs rounded-lg shadow-lg active:scale-95 border border-zinc-200">SETTINGS</div>
         </div>
 
         <div class="mb-12">
-            <h1 id="actor-text" class="text-zinc-500 font-black text-2xl italic uppercase tracking-tighter text-center">Ready</h1>
+            <h1 id="actor-text" class="text-zinc-500 font-black text-2xl italic uppercase tracking-tighter text-center leading-tight">Ready</h1>
         </div>
 
         <div id="switch-container" class="switch-plate switch-off">
@@ -104,30 +87,29 @@
         <div class="mt-12 flex flex-col items-center gap-6">
             <div id="id-editor" class="flex items-center gap-2 cursor-pointer">
                 <span id="current-id" class="text-xs font-black tracking-widest text-zinc-400 uppercase">ID: LOADING</span>
-                <span class="text-[10px] text-zinc-600">EDIT</span>
                 <input id="id-input" type="text" maxlength="8" class="hidden bg-transparent border-b border-orange-500 text-sm font-black text-center outline-none text-orange-500 uppercase">
             </div>
 
             <div id="live-indicator" class="flex items-center gap-2.5 bg-zinc-800/50 px-5 py-2 rounded-full border border-zinc-700">
                 <span id="dot" class="w-2.5 h-2.5 rounded-full bg-red-500"></span>
-                <span id="live-count" class="text-[11px] font-black text-white uppercase tracking-widest">Connecting...</span>
+                <span id="live-count" class="text-[11px] font-black text-white uppercase tracking-widest italic">Connecting...</span>
             </div>
         </div>
     </div>
 
-    <!-- 설정 모달 -->
+    <!-- 설정 레이어 -->
     <div id="settings-menu" class="hidden fixed inset-0 z-[200] flex items-center justify-center bg-black/80 backdrop-blur-md px-8">
         <div class="bg-white p-8 rounded-3xl w-full max-w-sm border-4 border-black">
             <h2 class="text-2xl font-black mb-8 uppercase italic border-b-4 border-black pb-2">Settings</h2>
             <div class="space-y-8">
                 <div class="flex justify-between items-center">
-                    <span class="font-black text-sm italic">SOUND FX</span>
+                    <span class="font-black text-sm italic uppercase">Sound FX</span>
                     <button id="toggle-sfx" class="w-12 h-6 bg-black rounded-full relative p-1">
                         <div id="sfx-knob" class="w-4 h-4 bg-white rounded-full transition-all"></div>
                     </button>
                 </div>
                 <div class="flex justify-between items-center">
-                    <span class="font-black text-sm italic">HAPTIC (VIBRATE)</span>
+                    <span class="font-black text-sm italic uppercase">Haptic (Vibrate)</span>
                     <button id="toggle-haptic" class="w-12 h-6 bg-black rounded-full relative p-1">
                         <div id="haptic-knob" class="w-4 h-4 bg-white rounded-full transition-all"></div>
                     </button>
@@ -138,7 +120,7 @@
     </div>
 
     <script>
-        // Vercel 환경 변수로 자동 치환되는 영역
+        // Vercel 환경 변수로 치환될 변수 (Build Command 설정 필요)
         const SUPABASE_URL = "VITE_SUPABASE_URL_PLACEHOLDER"; 
         const SUPABASE_KEY = "VITE_SUPABASE_KEY_PLACEHOLDER"; 
         
@@ -169,14 +151,14 @@
             if (isOn) {
                 body.style.backgroundColor = "#FFFFFF";
                 container.classList.replace('switch-off', 'switch-on');
-                actorText.innerText = `${senderId} TURNED ON`;
+                actorText.innerText = `${senderId}\nTURNED ON`;
                 actorText.style.color = "#000";
                 liveIndicator.className = "flex items-center gap-2.5 bg-zinc-100 px-5 py-2 rounded-full border border-zinc-300";
                 liveCountText.style.color = "#000";
             } else {
                 body.style.backgroundColor = "#000";
                 container.classList.replace('switch-on', 'switch-off');
-                actorText.innerText = `${senderId} TURNED OFF`;
+                actorText.innerText = `${senderId}\nTURNED OFF`;
                 actorText.style.color = "#444";
                 liveIndicator.className = "flex items-center gap-2.5 bg-black/80 px-5 py-2 rounded-full border border-zinc-700";
                 liveCountText.style.color = "#fff";
@@ -186,20 +168,28 @@
         }
 
         if (supabaseClient) {
-            const channel = supabaseClient.channel('global-room', {
-                config: { broadcast: { self: false } }
+            const channel = supabaseClient.channel('global-presence', {
+                config: { presence: { key: myId } }
             });
 
+            // Presence 데이터 동기화 (실시간 접속자 수 파악)
             channel
+            .on('presence', { event: 'sync' }, () => {
+                const state = channel.presenceState();
+                const count = Object.keys(state).length;
+                liveCountText.innerText = `${count.toLocaleString()} LIVE CONNECTED`;
+            })
+            // 브로드캐스트 (스위치 상태 동기화)
             .on('broadcast', { event: 'toggle' }, ({ payload }) => {
                 isOn = payload.status;
                 updateUI(payload.id);
                 playFeedback(false); 
             })
-            .subscribe((status) => {
+            .subscribe(async (status) => {
                 if (status === 'SUBSCRIBED') {
-                    liveCountText.innerText = "14,209 CONNECTED"; // 실제 카운트는 DB 필요하므로 고정값 예시
                     dot.className = "w-2.5 h-2.5 rounded-full bg-green-500 shadow-[0_0_8px_#22c55e]";
+                    // 내 접속 상태 등록
+                    await channel.track({ online_at: new Date().toISOString() });
                 }
             });
 
@@ -212,24 +202,23 @@
             };
         }
 
-        function playFeedback(isOwner = true) {
-            if (config.sfx) {
+        function playFeedback(vibrateOnly = false) {
+            if (config.sfx && !vibrateOnly) {
                 const sfx = new Audio(isOn 
                     ? "https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3" 
                     : "https://assets.mixkit.co/active_storage/sfx/2572/2572-preview.mp3");
                 sfx.volume = 0.2;
                 sfx.play().catch(()=>{});
             }
-            // 햅틱 진동 처리 (isOwner일 때만 진동하거나 설정 켜져있을 때)
             if (config.haptic && navigator.vibrate) {
-                navigator.vibrate(isOn ? [40] : [20, 30, 20]);
+                navigator.vibrate(30);
             }
         }
 
         function trigger() {
             isOn = !isOn;
             updateUI(myId);
-            playFeedback(true);
+            playFeedback(false);
             if (window.broadcastToggle) window.broadcastToggle(isOn);
         }
 
@@ -240,7 +229,7 @@
         document.getElementById('toggle-haptic').addEventListener('click', () => { 
             config.haptic = !config.haptic; 
             updateUI(); 
-            if(config.haptic && navigator.vibrate) navigator.vibrate(50);
+            if(config.haptic && navigator.vibrate) navigator.vibrate(40);
         });
         document.getElementById('close-settings').addEventListener('click', () => {
             localStorage.setItem('cfg-sfx', config.sfx);
