@@ -128,17 +128,13 @@
     </div>
 
     <script>
-        /**
-         * [보안 팁] 깃허브 공개 시 키를 숨기는 방법:
-         * 1. 아래 변수들은 Vercel의 Environment Variables 기능을 사용하거나
-         * 2. 공개 레포지토리라면 그냥 적으셔도 무방합니다 (Supabase Anon Key는 공개용입니다).
-         * 3. RLS 설정을 통해 DB를 보호하는 것이 훨씬 중요합니다.
-         */
-        const SUPABASE_URL = "https://ixjvidxvgveisbgdvjkr.supabase.co"; 
-        const SUPABASE_KEY = "발급받은_아논키를_여기에_넣으세요"; 
+        // 깃허브에는 이 상태(빈 칸)로 올리세요.
+        const SUPABASE_URL = "VITE_SUPABASE_URL_PLACEHOLDER"; 
+        const SUPABASE_KEY = "VITE_SUPABASE_KEY_PLACEHOLDER"; 
         
         let supabaseClient = null;
-        if(SUPABASE_URL && SUPABASE_KEY.length > 20) {
+        // 실제 값이 들어왔을 때만 실행
+        if(SUPABASE_URL.startsWith("http") && SUPABASE_KEY.length > 20) {
             supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
         }
 
@@ -205,6 +201,9 @@
                     payload: { id: myId, status: status }
                 });
             };
+        } else {
+            liveCountText.innerText = "KEY MISSING";
+            liveCountText.style.color = "#ef4444";
         }
 
         function playFeedback(vibrate = true) {
@@ -264,5 +263,4 @@
     </script>
 </body>
 </html>
-
 
