@@ -273,7 +273,7 @@
 
         document.getElementById('donate-btn-action').addEventListener('click', () => {
             if (window.broadcastDonation) window.broadcastDonation();
-            // 후원 버튼을 누르면 이 유저를 일시적으로 Supporter로 간주 (테스트용/유도용)
+            // 후원 버튼을 누르면 이 유저를 일시적으로 Supporter로 간주 (과금?유도용)
             // 실제로는 송금 확인이 안 되지만, 유저에게 기분을 내게 해줌
             isSupporter = true;
             localStorage.setItem('is-supporter', 'true');
