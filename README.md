@@ -11,7 +11,7 @@ A real-time social experiment where everyone on Earth controls the same physical
 🚀 Experience it Live
 Click the link below to join the global interaction:
 
-👉 Launch Global Switch
+👉 [Launch Global Switch](https://light-iota-indol.vercel.app/)
 
 ⚡ Quick Features
 Zero-Latency Sync: Powered by Supabase Realtime for instant feedback.
