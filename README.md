@@ -19,3 +19,13 @@ Zero-Latency Sync: Powered by Supabase Realtime for instant feedback.
 Pure Dopamine: Experience the tug-of-war between thousands of users.
 
 Tactile Design: Premium UI with realistic sound and haptic responses.
+
+
+
+
+------------------------------------------------------------------------------------------------
+
+
+데이터 절약 및 낭비 방지를 위해 트래픽 제한을 걸어 조금 차이가 있을 수 있음
+터치시 소리 나게 하는거 설정에 추가할지 고민중
+Coffee me 연결 고려중
