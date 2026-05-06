@@ -113,7 +113,7 @@
             <div id="id-editor" class="flex flex-col items-center gap-1 cursor-pointer">
                 <div class="flex items-center">
                     <span id="current-id" class="text-[10px] font-black tracking-[0.3em] text-zinc-500 uppercase opacity-50">ID: LOADING</span>
-                    <span id="my-supporter-badge" class="supporter-badge hidden">👑 SUPPORTER</span>
+                    <span id="my-supporter-badge" class="supporter-badge hidden">SUPPORTER/</span>
                 </div>
                 <input id="id-input" type="text" maxlength="8" class="hidden bg-transparent border-b-2 border-yellow-500 text-lg font-black text-center outline-none text-yellow-500 uppercase">
             </div>
@@ -207,7 +207,7 @@
             const toast = document.createElement('div');
             toast.className = "toast-notify mb-4 px-6 py-4 bg-yellow-400 text-black font-black rounded-3xl shadow-2xl flex flex-col items-center border-4 border-black";
             toast.innerHTML = `<span class="text-xs opacity-70 uppercase tracking-tighter">New Supporter Alert</span>
-                               <span class="text-sm">👑 ${donorId}님이 후원을 고려 중입니다!</span>`;
+                               <span class="text-sm">👑 ${donorId}님이 후원 버튼을 클릭했습니다!</span>`;
             toastContainer.appendChild(toast);
             setTimeout(() => toast.remove(), 4000);
             
@@ -272,7 +272,7 @@
 
         document.getElementById('donate-btn-action').addEventListener('click', () => {
             if (window.broadcastDonation) window.broadcastDonation();
-            // 후원 버튼을 누르면 이 유저를 일시적으로 Supporter로 간주 (과금?유도용) (삭제 예정)
+            // 후원 버튼을 누르면 이 유저를 일시적으로 Supporter로 간주 (과금?유도용) (삭제 예정, 귀찮음)
             isSupporter = true;
             localStorage.setItem('is-supporter', 'true');
             updateMyInfo();
